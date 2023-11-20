@@ -1,8 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MainManager : MonoBehaviour
 {
@@ -17,8 +21,12 @@ public class MainManager : MonoBehaviour
     private int m_Points;
     
     private bool m_GameOver = false;
-
     
+    public string currentPlayer;
+
+    public Text bestScoreText;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +44,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        currentPlayer = MenuManager.Instance.currentPlayer;
     }
 
     private void Update()
@@ -60,12 +70,29 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+        
+        if(MenuManager.Instance.maxScorer!=null)
+        {
+            bestScoreText.text = $"Best Score : {MenuManager.Instance.maxScorer} : {MenuManager.Instance.bestScore}";
+        }
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
+        
         ScoreText.text = $"Score : {m_Points}";
+        
+        // if(MenuManager.Instance.maxScorer!=null)
+        // {
+        //     bestScoreText.text = $"Best Score : {MenuManager.Instance.maxScorer} : {MenuManager.Instance.bestScore}";
+        // }
+
+        if (m_Points > MenuManager.Instance.bestScore)
+        {
+            MenuManager.Instance.bestScore = m_Points;
+            MenuManager.Instance.maxScorer = currentPlayer;
+        }
     }
 
     public void GameOver()
@@ -73,4 +100,6 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
+    
+   
 }
